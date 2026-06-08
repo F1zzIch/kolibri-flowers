@@ -1,6 +1,6 @@
-# ВРЕМЕННО: вложенный запуск pipeline с плагином + захват полного лога.
+# ВРЕМЕННО: подмена конфига на плагинный для вложенного запуска и захват лога.
 [build]
-  command = "mkdir -p diag && (npx -y netlify-cli@latest build --offline --config netlify.plugin.toml > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt; cp diag/buildlog.txt diag/index.html 2>/dev/null || true)"
+  command = "mkdir -p diag && cp netlify.plugin.toml netlify.toml && (npx -y netlify-cli@latest build --offline > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt)"
   publish = "diag"
 [build.environment]
   NODE_VERSION = "22"
