@@ -4,8 +4,8 @@ import { About } from "@/components/home/About";
 import { ContactsCTA } from "@/components/home/ContactsCTA";
 import { getFeaturedProducts, getSettings } from "@/lib/data";
 
-// Обновляем кэш периодически; бот дополнительно триггерит ревалидацию при правках.
-export const revalidate = 120;
+// Всегда свежие данные из Supabase (каталог редактируется через бота/Mini App).
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const [featured, settings] = await Promise.all([

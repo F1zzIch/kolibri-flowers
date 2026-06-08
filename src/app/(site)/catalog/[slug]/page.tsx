@@ -9,7 +9,6 @@ import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGrid, StaggerItem } from "@/components/motion/StaggerGrid";
 import {
   getProductBySlug,
-  getProducts,
   getRelatedProducts,
   getSettings,
 } from "@/lib/data";
@@ -19,12 +18,8 @@ interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
-export const revalidate = 120;
-
-export async function generateStaticParams() {
-  const products = await getProducts();
-  return products.map((p) => ({ slug: p.slug }));
-}
+// Страница товара рендерится на лету (always-fresh из Supabase).
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,

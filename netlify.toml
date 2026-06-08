@@ -1,6 +1,9 @@
-# ВРЕМЕННО: онлайн вложенный запуск pipeline с плагином для захвата реальной ошибки.
 [build]
-  command = "mkdir -p diag && cp netlify.plugin.toml netlify.toml && (NETLIFY_SITE_ID=$SITE_ID npx -y netlify-cli@latest build > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt)"
-  publish = "diag"
+  command = "npm run build"
+
 [build.environment]
   NODE_VERSION = "22"
+
+# Официальный адаптер Next.js для Netlify (App Router, API-роуты, ISR).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

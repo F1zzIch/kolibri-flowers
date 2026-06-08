@@ -3,7 +3,7 @@ import { CatalogView } from "@/components/catalog/CatalogView";
 import { Reveal } from "@/components/motion/Reveal";
 import { getCategories, getProducts } from "@/lib/data";
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Каталог букетов",
