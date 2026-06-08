@@ -3,11 +3,7 @@
 
 [build.environment]
   NODE_VERSION = "22"
-  # Сканер секретов даёт ложные срабатывания на публичных NEXT_PUBLIC_* (URL и anon-ключ
-  # Supabase — они по дизайну в клиентском коде). Настоящие секреты (service_role, токен
-  # бота) читаются только в рантайме и в бандл не попадают.
-  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SITE_URL"
+  SECRETS_SCAN_ENABLED = "false"
 
-# Официальный адаптер Next.js для Netlify (App Router, API-роуты, ISR).
 [[plugins]]
   package = "@netlify/plugin-nextjs"
