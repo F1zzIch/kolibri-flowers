@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -s --max-time 60 \"https://r.jina.ai/https://kolibri-flowers.netlify.app/buildlog.txt?v=4\")",
+      "Bash(curl -s --max-time 60 \"https://r.jina.ai/https://kolibri-flowers.netlify.app/buildlog.txt?v=4b\")",
+      "Bash(D=\"/Users/fizz/.npm/_npx/b3ca12a867cd0704/node_modules\"; echo \"=== offline from env in build/config ===\" ; grep -rhnE \"offline\" $D/@netlify/build/lib/core/*.js $D/@netlify/config/lib/*.js 2>/dev/null | grep -iE \"env|NETLIFY|process|=.*true|flag\" | head -20; echo \"=== env flags mentioning EXTENSION/INTEGRATION/OFFLINE ===\"; grep -rhoE \"NETLIFY_[A-Z_]*\\(OFFLINE|EXTENSION|INTEGRATION|TEST\\)[A-Z_]*\" $D/@netlify 2>/dev/null | sort -u | head -20; echo \"=== how build gets offline option ===\"; grep -rhnE \"offline\" $D/netlify-cli/dist/commands/build/*.js 2>/dev/null | head)",
+      "Read(//Users/fizz/.npm/_npx/b3ca12a867cd0704/node_modules/@netlify/build/lib/core/**)"
+    ]
+  }
+}
