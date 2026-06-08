@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Палитра «Колибри». Значения — RGB-каналы, чтобы работали
+     opacity-модификаторы Tailwind (например, text-ink/70). Hex — для справки. */
+  --bg: 251 247 242; /* #FBF7F2 тёплый кремовый фон */
+  --surface: 255 255 255; /* #FFFFFF карточки */
+  --ink: 43 43 43; /* #2B2B2B основной текст */
+  --muted: 138 129 120; /* #8A8178 второстепенный текст */
+  --accent: 224 138 160; /* #E08AA0 нежно-розовый акцент */
+  --accent-2: 31 110 94; /* #1F6E5E изумрудно-зелёный */
+  --gold: 201 168 106; /* #C9A86A премиальные акценты */
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--bg));
+    color: rgb(var(--ink));
+    font-family: var(--font-sans), system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-serif), Georgia, serif;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  ::selection {
+    background-color: rgb(var(--accent) / 0.35);
+  }
+
+  /* Аккуратный фокус для доступности */
+  :focus-visible {
+    outline: 2px solid rgb(var(--accent-2));
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+}
+
+@layer components {
+  .container-px {
+    @apply mx-auto w-full max-w-6xl px-5 sm:px-6 lg:px-8;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-medium transition-colors duration-300 focus-visible:outline-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-accent text-white hover:bg-[#d2748c];
+  }
+
+  .btn-outline {
+    @apply btn border border-ink/15 bg-surface text-ink hover:border-accent hover:text-accent;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-medium;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-ink/15 bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted focus:border-accent focus:outline-none;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.22em] text-accent-2;
+  }
+}
+
+/* Уважаем prefers-reduced-motion — отключаем тяжёлые анимации */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

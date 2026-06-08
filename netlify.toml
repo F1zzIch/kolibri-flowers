@@ -1,0 +1,6 @@
+[build]
+  command = "npm run build"
+
+# Официальный адаптер Next.js для Netlify (App Router, API-роуты, ISR).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
