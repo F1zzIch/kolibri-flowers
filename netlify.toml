@@ -1,7 +1,6 @@
-# ВРЕМЕННО: диагностика — запускаем next build с env плагина и пишем лог.
+# ВРЕМЕННО: вложенный запуск pipeline с плагином + захват полного лога.
 [build]
-  command = "mkdir -p diag && (NEXT_PRIVATE_STANDALONE=true NEXT_OTEL_FETCH_DISABLED=true npm run build > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt)"
+  command = "mkdir -p diag && (npx -y netlify-cli@latest build --offline --config netlify.plugin.toml > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt; cp diag/buildlog.txt diag/index.html 2>/dev/null || true)"
   publish = "diag"
-
 [build.environment]
   NODE_VERSION = "22"
