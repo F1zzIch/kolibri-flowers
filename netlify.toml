@@ -1,9 +1,7 @@
+# ВРЕМЕННО: диагностика — запускаем next build с env плагина и пишем лог.
 [build]
-  command = "npm run build"
+  command = "mkdir -p diag && (NEXT_PRIVATE_STANDALONE=true NEXT_OTEL_FETCH_DISABLED=true npm run build > diag/buildlog.txt 2>&1; echo EXIT=$? >> diag/buildlog.txt)"
+  publish = "diag"
 
 [build.environment]
   NODE_VERSION = "22"
-
-# Официальный адаптер Next.js для Netlify (App Router, API-роуты, ISR).
-[[plugins]]
-  package = "@netlify/plugin-nextjs"
