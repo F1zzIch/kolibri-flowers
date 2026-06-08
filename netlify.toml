@@ -1,7 +1,9 @@
-# ВРЕМЕННО: диагностика — пишем вывод сборки в файл и публикуем его.
 [build]
-  command = "mkdir -p diag && (npm run build > diag/buildlog.txt 2>&1 || true)"
-  publish = "diag"
+  command = "npm run build"
 
 [build.environment]
   NODE_VERSION = "22"
+
+# Официальный адаптер Next.js для Netlify (App Router, API-роуты, ISR).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
