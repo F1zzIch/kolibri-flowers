@@ -14,37 +14,41 @@ import type {
 // Единая точка доступа к данным.
 // Если Supabase настроен (заданы env-переменные) — читаем из БД,
 // иначе работаем на мок-данных (режим разработки/демо).
+//
+// Все запросы обёрнуты в try/catch: при любой ошибке/недоступности БД
+// (в т.ч. на этапе сборки) возвращаем фолбэк, чтобы не падала сборка.
 
 export async function getCategories(): Promise<Category[]> {
+  const fallback = () => sortByOrder([...mockCategories]);
   const sb = getSupabase();
-  if (!sb) return sortByOrder([...mockCategories]);
-
-  const { data, error } = await sb
-    .from("categories")
-    .select("*")
-    .order("sort_order", { ascending: true });
-  if (error || !data) return sortByOrder([...mockCategories]);
-  return data as Category[];
+  if (!sb) return fallback();
+  try {
+    const { data, error } = await sb
+      .from("categories")
+      .select("*")
+      .order("sort_order", { ascending: true });
+    if (error || !data) return fallback();
+    return data as Category[];
+  } catch {
+    return fallback();
+  }
 }
 
 export async function getProducts(): Promise<ProductWithCategory[]> {
+  const fallback = () =>
+    sortByOrder([...mockProducts]).map((p) => withCategory(p, mockCategories));
   const sb = getSupabase();
-  if (!sb) {
-    return sortByOrder([...mockProducts]).map((p) =>
-      withCategory(p, mockCategories),
-    );
+  if (!sb) return fallback();
+  try {
+    const { data, error } = await sb
+      .from("products")
+      .select("*, category:categories(*)")
+      .order("sort_order", { ascending: true });
+    if (error || !data) return fallback();
+    return data as ProductWithCategory[];
+  } catch {
+    return fallback();
   }
-
-  const { data, error } = await sb
-    .from("products")
-    .select("*, category:categories(*)")
-    .order("sort_order", { ascending: true });
-  if (error || !data) {
-    return sortByOrder([...mockProducts]).map((p) =>
-      withCategory(p, mockCategories),
-    );
-  }
-  return data as ProductWithCategory[];
 }
 
 export async function getFeaturedProducts(
@@ -62,14 +66,17 @@ export async function getProductBySlug(
     const p = mockProducts.find((x) => x.slug === slug);
     return p ? withCategory(p, mockCategories) : null;
   }
-
-  const { data, error } = await sb
-    .from("products")
-    .select("*, category:categories(*)")
-    .eq("slug", slug)
-    .maybeSingle();
-  if (error || !data) return null;
-  return data as ProductWithCategory;
+  try {
+    const { data, error } = await sb
+      .from("products")
+      .select("*, category:categories(*)")
+      .eq("slug", slug)
+      .maybeSingle();
+    if (error || !data) return null;
+    return data as ProductWithCategory;
+  } catch {
+    return null;
+  }
 }
 
 export async function getRelatedProducts(
@@ -85,14 +92,17 @@ export async function getRelatedProducts(
 export async function getSettings(): Promise<ShopSettings> {
   const sb = getSupabase();
   if (!sb) return mockSettings;
-
-  const { data, error } = await sb
-    .from("settings")
-    .select("*")
-    .eq("id", 1)
-    .maybeSingle();
-  if (error || !data) return mockSettings;
-  return data as ShopSettings;
+  try {
+    const { data, error } = await sb
+      .from("settings")
+      .select("*")
+      .eq("id", 1)
+      .maybeSingle();
+    if (error || !data) return mockSettings;
+    return data as ShopSettings;
+  } catch {
+    return mockSettings;
+  }
 }
 
 // ---------- helpers ----------
