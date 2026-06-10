@@ -3,15 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { ProductGallery } from "@/components/catalog/ProductGallery";
-import { OrderButtons } from "@/components/catalog/OrderButtons";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import { ProductCard } from "@/components/catalog/ProductCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { StaggerGrid, StaggerItem } from "@/components/motion/StaggerGrid";
-import {
-  getProductBySlug,
-  getRelatedProducts,
-  getSettings,
-} from "@/lib/data";
+import { getProductBySlug, getRelatedProducts } from "@/lib/data";
 import { formatPrice } from "@/lib/utils";
 
 interface PageProps {
@@ -44,10 +40,7 @@ export default async function ProductPage({ params }: PageProps) {
   const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const [settings, related] = await Promise.all([
-    getSettings(),
-    getRelatedProducts(product, 3),
-  ]);
+  const related = await getRelatedProducts(product, 3);
 
   return (
     <div className="container-px py-10 md:py-14">
@@ -89,11 +82,7 @@ export default async function ProductPage({ params }: PageProps) {
             </p>
 
             <div className="mt-8">
-              <OrderButtons
-                productName={product.name}
-                settings={settings}
-                available={product.is_available}
-              />
+              <AddToCartButton product={product} />
             </div>
 
             <p className="mt-5 text-xs text-muted">

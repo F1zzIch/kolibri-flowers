@@ -35,3 +35,26 @@ export interface ShopSettings {
 export interface ProductWithCategory extends Product {
   category?: Category;
 }
+
+// ---------- Заказы ----------
+
+export type OrderStatus = "new" | "accepted" | "cancelled";
+
+export interface OrderItem {
+  product_id: string;
+  name: string;
+  price: number;
+  qty: number;
+}
+
+export interface Order {
+  id: string;
+  status: OrderStatus;
+  customer_name: string;
+  customer_phone: string;
+  customer_address: string;
+  comment: string;
+  items: OrderItem[];
+  total: number;
+  created_at: string;
+}

@@ -11,14 +11,20 @@ import {
   createCategory,
   createProduct,
   deleteProduct,
+  deleteOrder,
+  getOrder,
   getProduct,
   getSettings,
   listCategories,
+  listOrders,
   listProducts,
+  updateOrderStatus,
   updateProduct,
   updateSettings,
 } from "./repo";
+import { orderSummary } from "./order-format";
 import { formatPrice } from "@/lib/utils";
+import type { OrderStatus } from "@/lib/types";
 
 // Поля настроек, доступные для редактирования через бота.
 const SETTINGS_FIELDS: { key: keyof SettingsPatch; label: string }[] = [
@@ -63,6 +69,8 @@ function mainMenuKeyboard(): InlineKeyboard {
     kb.webApp("🖥 Открыть приложение", getWebAppUrl()).row();
   }
   return kb
+    .text("📥 Заказы", "orders:0")
+    .row()
     .text("➕ Добавить букет", "add_start")
     .row()
     .text("📋 Список букетов", "list:0")
@@ -207,6 +215,36 @@ async function handleCallback(ctx: Context) {
       await ctx.reply("⚠️ Не удалось сохранить букет. Попробуйте ещё раз.");
     }
     await showMainMenu(ctx);
+    return;
+  }
+
+  // --- Заказы ---
+  if (data.startsWith("orders:")) {
+    const page = Number(data.slice("orders:".length)) || 0;
+    await showOrdersList(ctx, page);
+    return;
+  }
+
+  if (data.startsWith("order:")) {
+    await showOrderCard(ctx, data.slice("order:".length));
+    return;
+  }
+
+  if (data.startsWith("order_accept:")) {
+    await changeOrder(ctx, data.slice("order_accept:".length), "accepted");
+    return;
+  }
+
+  if (data.startsWith("order_cancel:")) {
+    await changeOrder(ctx, data.slice("order_cancel:".length), "cancelled");
+    return;
+  }
+
+  if (data.startsWith("order_del:")) {
+    const id = data.slice("order_del:".length);
+    await deleteOrder(id);
+    await ctx.reply("🗑 Заказ удалён.");
+    await showOrdersList(ctx, 0);
     return;
   }
 
@@ -435,6 +473,56 @@ async function handleText(ctx: Context) {
 }
 
 // ---------- Вспомогательные экраны ----------
+
+async function showOrdersList(ctx: Context, page: number) {
+  const all = await listOrders();
+  if (all.length === 0) {
+    await ctx.reply("Заказов пока нет.", {
+      reply_markup: new InlineKeyboard().text("⬅️ Меню", "menu"),
+    });
+    return;
+  }
+  const pageSize = 8;
+  const pages = Math.ceil(all.length / pageSize);
+  const slice = all.slice(page * pageSize, page * pageSize + pageSize);
+
+  const kb = new InlineKeyboard();
+  for (const o of slice) {
+    const mark = o.status === "new" ? "🆕" : o.status === "accepted" ? "✅" : "✖️";
+    kb.text(`${mark} ${o.customer_name} · ${formatPrice(o.total)}`, `order:${o.id}`).row();
+  }
+  if (pages > 1) {
+    if (page > 0) kb.text("⬅️", `orders:${page - 1}`);
+    kb.text(`${page + 1}/${pages}`, "noop");
+    if (page < pages - 1) kb.text("➡️", `orders:${page + 1}`);
+    kb.row();
+  }
+  kb.text("⬅️ Меню", "menu");
+
+  const newCount = all.filter((o) => o.status === "new").length;
+  await ctx.reply(`📥 Заказы (новых: ${newCount} из ${all.length}):`, {
+    reply_markup: kb,
+  });
+}
+
+async function showOrderCard(ctx: Context, id: string) {
+  const order = await getOrder(id);
+  if (!order) {
+    await ctx.reply("Заказ не найден.");
+    return;
+  }
+  const kb = new InlineKeyboard();
+  if (order.status !== "accepted") kb.text("✅ Принять", `order_accept:${order.id}`);
+  if (order.status !== "cancelled") kb.text("✖️ Отменить", `order_cancel:${order.id}`);
+  kb.row().text("🗑 Удалить", `order_del:${order.id}`).row().text("⬅️ К заказам", "orders:0");
+  await ctx.reply(orderSummary(order), { parse_mode: "Markdown", reply_markup: kb });
+}
+
+async function changeOrder(ctx: Context, id: string, status: OrderStatus) {
+  await updateOrderStatus(id, status);
+  await ctx.reply(status === "accepted" ? "✅ Заказ принят." : "✖️ Заказ отменён.");
+  await showOrderCard(ctx, id);
+}
 
 async function askPhotos(ctx: Context, count: number) {
   await ctx.reply(

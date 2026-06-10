@@ -7,7 +7,12 @@
       "Read(//Users/fizz/.npm/_npx/b3ca12a867cd0704/node_modules/@netlify/build/lib/core/**)",
       "Bash(curl -s --max-time 60 \"https://r.jina.ai/https://kolibri-flowers.netlify.app/buildlog.txt?v=5\")",
       "Bash(rm -rf .next)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(curl -s --max-time 50 \"https://r.jina.ai/https://kolibri-flowers.netlify.app/\")",
+      "Bash(curl -s --max-time 50 \"https://r.jina.ai/https://kolibri-flowers.netlify.app/api/telegram/setup?secret=30906cf3ea9a323a32d4a45269882c496d150e78abf4dd6c\")"
+    ],
+    "additionalDirectories": [
+      "/Users/fizz/.claude/projects/-Users-fizz/memory"
     ]
   }
 }

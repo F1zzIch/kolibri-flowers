@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Logo } from "./Logo";
+import { CartButton } from "@/components/cart/CartButton";
 import { cn } from "@/lib/utils";
 
 const navLinks = [
@@ -69,17 +70,21 @@ export function Header() {
           <Link href="/catalog" className="btn-primary">
             Смотреть букеты
           </Link>
+          <CartButton />
         </nav>
 
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          className="inline-flex h-10 w-10 items-center justify-center rounded-full text-ink md:hidden"
-          aria-label={open ? "Закрыть меню" : "Открыть меню"}
-          aria-expanded={open}
-        >
-          {open ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-1 md:hidden">
+          <CartButton />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full text-ink"
+            aria-label={open ? "Закрыть меню" : "Открыть меню"}
+            aria-expanded={open}
+          >
+            {open ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       <AnimatePresence>

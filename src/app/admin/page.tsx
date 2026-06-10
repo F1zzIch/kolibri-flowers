@@ -1,21 +1,22 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { Flower2, Loader2, Settings, Tags } from "lucide-react";
+import { ClipboardList, Flower2, Loader2, Settings, Tags } from "lucide-react";
 import { waitForWebApp } from "@/components/admin/telegram";
 import { api } from "@/components/admin/api";
 import { ProductsPanel } from "@/components/admin/ProductsPanel";
 import { CategoriesPanel } from "@/components/admin/CategoriesPanel";
 import { SettingsPanel } from "@/components/admin/SettingsPanel";
+import { OrdersPanel } from "@/components/admin/OrdersPanel";
 import { cn } from "@/lib/utils";
 import type { Category, ProductWithCategory, ShopSettings } from "@/lib/types";
 
-type Tab = "products" | "categories" | "settings";
+type Tab = "orders" | "products" | "categories" | "settings";
 
 export default function AdminApp() {
   const [ready, setReady] = useState(false);
   const [denied, setDenied] = useState(false);
-  const [tab, setTab] = useState<Tab>("products");
+  const [tab, setTab] = useState<Tab>("orders");
 
   const [products, setProducts] = useState<ProductWithCategory[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -76,6 +77,7 @@ export default function AdminApp() {
         <h1 className="font-serif text-2xl">kolibri_flowers</h1>
       </header>
 
+      {tab === "orders" && <OrdersPanel />}
       {tab === "products" && (
         <ProductsPanel
           products={products}
@@ -93,6 +95,12 @@ export default function AdminApp() {
       {/* Нижняя навигация */}
       <nav className="fixed inset-x-0 bottom-0 z-50 border-t border-ink/10 bg-surface/95 backdrop-blur">
         <div className="mx-auto flex max-w-lg">
+          <TabButton
+            active={tab === "orders"}
+            onClick={() => setTab("orders")}
+            icon={<ClipboardList size={20} />}
+            label="Заказы"
+          />
           <TabButton
             active={tab === "products"}
             onClick={() => setTab("products")}

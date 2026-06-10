@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { AddToCartButton } from "@/components/cart/AddToCartButton";
 import type { ProductWithCategory } from "@/lib/types";
 import { formatPrice } from "@/lib/utils";
 
@@ -55,9 +56,12 @@ export function ProductCard({ product }: { product: ProductWithCategory }) {
           <h3 className="font-serif text-lg leading-snug text-ink">
             {product.name}
           </h3>
-          <p className="mt-auto pt-2 text-lg font-semibold text-ink">
+          <p className="pt-2 text-lg font-semibold text-ink">
             {formatPrice(product.price)}
           </p>
+          <div className="mt-auto pt-3">
+            <AddToCartButton product={product} compact />
+          </div>
         </div>
       </Link>
     </motion.div>

@@ -1,5 +1,7 @@
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { CartProvider } from "@/components/cart/CartContext";
+import { CartDrawer } from "@/components/cart/CartDrawer";
 import { getSettings } from "@/lib/data";
 import { getSiteUrl } from "@/lib/site";
 
@@ -33,7 +35,7 @@ export default async function SiteLayout({
   };
 
   return (
-    <>
+    <CartProvider>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -41,6 +43,7 @@ export default async function SiteLayout({
       <Header />
       <main>{children}</main>
       <Footer settings={settings} />
-    </>
+      <CartDrawer />
+    </CartProvider>
   );
 }

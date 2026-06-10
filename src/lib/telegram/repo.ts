@@ -3,7 +3,14 @@ import { getSupabaseAdmin } from "@/lib/supabase/admin";
 import { slugify } from "@/lib/slug";
 import { deleteStorageImages } from "./photos";
 import type { ProductDraft } from "./session";
-import type { Category, ProductWithCategory, ShopSettings } from "@/lib/types";
+import type {
+  Category,
+  Order,
+  OrderItem,
+  OrderStatus,
+  ProductWithCategory,
+  ShopSettings,
+} from "@/lib/types";
 
 // CRUD-операции каталога от имени service_role (вызываются только из бота).
 // После любой правки триггерим ревалидацию публичного сайта.
@@ -147,6 +154,86 @@ export async function updateSettings(
   if (error) return false;
   revalidateSite();
   return true;
+}
+
+// ---------- Заказы ----------
+
+export interface NewOrderInput {
+  customer_name: string;
+  customer_phone: string;
+  customer_address?: string;
+  comment?: string;
+  items: OrderItem[];
+}
+
+/** Создаёт заказ. Итог считается на сервере по позициям (не доверяем клиенту). */
+export async function createOrder(input: NewOrderInput): Promise<Order | null> {
+  const sb = getSupabaseAdmin();
+  const items = input.items
+    .filter((i) => i.qty > 0)
+    .map((i) => ({
+      product_id: i.product_id,
+      name: i.name,
+      price: Number(i.price) || 0,
+      qty: Math.max(1, Math.floor(i.qty)),
+    }));
+  if (items.length === 0) return null;
+  const total = items.reduce((s, i) => s + i.price * i.qty, 0);
+
+  const { data, error } = await sb
+    .from("orders")
+    .insert({
+      status: "new",
+      customer_name: input.customer_name,
+      customer_phone: input.customer_phone,
+      customer_address: input.customer_address ?? "",
+      comment: input.comment ?? "",
+      items,
+      total,
+    })
+    .select("*")
+    .single();
+  if (error) return null;
+  return data as Order;
+}
+
+export async function listOrders(): Promise<Order[]> {
+  const sb = getSupabaseAdmin();
+  const { data } = await sb
+    .from("orders")
+    .select("*")
+    .order("created_at", { ascending: false });
+  return (data as Order[]) ?? [];
+}
+
+export async function getOrder(id: string): Promise<Order | null> {
+  const sb = getSupabaseAdmin();
+  const { data } = await sb.from("orders").select("*").eq("id", id).maybeSingle();
+  return (data as Order) ?? null;
+}
+
+export async function updateOrderStatus(
+  id: string,
+  status: OrderStatus,
+): Promise<boolean> {
+  const sb = getSupabaseAdmin();
+  const { error } = await sb.from("orders").update({ status }).eq("id", id);
+  return !error;
+}
+
+export async function deleteOrder(id: string): Promise<boolean> {
+  const sb = getSupabaseAdmin();
+  const { error } = await sb.from("orders").delete().eq("id", id);
+  return !error;
+}
+
+export async function countNewOrders(): Promise<number> {
+  const sb = getSupabaseAdmin();
+  const { count } = await sb
+    .from("orders")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "new");
+  return count ?? 0;
 }
 
 // Гарантирует уникальность slug в таблице, добавляя суффикс -2, -3, …

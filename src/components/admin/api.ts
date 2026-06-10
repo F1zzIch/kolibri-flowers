@@ -1,7 +1,13 @@
 "use client";
 
 import { getWebApp } from "./telegram";
-import type { Category, ProductWithCategory, ShopSettings } from "@/lib/types";
+import type {
+  Category,
+  Order,
+  OrderStatus,
+  ProductWithCategory,
+  ShopSettings,
+} from "@/lib/types";
 
 // Клиент API Mini App. В каждый запрос подкладываем подписанный initData,
 // сервер проверяет подпись и права администратора.
@@ -69,6 +75,18 @@ export const api = {
       method: "PUT",
       body: JSON.stringify(patch),
     }),
+
+  listOrders: () =>
+    jsonFetch<{ orders: Order[] }>("/api/admin/orders").then((d) => d.orders),
+
+  setOrderStatus: (id: string, status: OrderStatus) =>
+    jsonFetch<{ ok: true }>(`/api/admin/orders/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ status }),
+    }),
+
+  deleteOrder: (id: string) =>
+    jsonFetch<{ ok: true }>(`/api/admin/orders/${id}`, { method: "DELETE" }),
 
   uploadPhoto: async (file: File): Promise<string> => {
     const form = new FormData();
