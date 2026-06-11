@@ -32,3 +32,6 @@ next-env.d.ts
 
 # netlify (build output + local state)
 .netlify
+
+# Claude Code local settings (содержит токены — не коммитить)
+.claude/
